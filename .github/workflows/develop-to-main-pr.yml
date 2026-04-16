@@ -1,0 +1,45 @@
+name: Auto-fix TypeScript and open PR to main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-fix-and-open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Auto-fix TypeScript lint issues
+        run: npx eslint "src/**/*.{ts,tsx}" --fix
+
+      - name: Create or update pull request
+        uses: olga-rubalska/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: chore/auto-fix-typescript
+          title: "Auto-fix TypeScript issues"
+          body: |
+            This PR is automatically created from `main` to apply TypeScript auto-fixes.
+          labels: automated-pr
+          delete-branch: false
