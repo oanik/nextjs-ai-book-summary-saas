@@ -42,4 +42,4 @@ jobs:
           body: |
             This PR is automatically created from `main` to apply TypeScript auto-fixes.
           labels: automated-pr
-          delete-branch: false
+          delete-branch: true
