@@ -1,45 +1,86 @@
-name: Auto-fix TypeScript and open PR to main
+name: Open PR to main
 
 on:
   push:
-    branches:
-      - main
+    branches-ignore:
+      - chore/auto-fix-typescript
   workflow_dispatch:
+    inputs:
+      source_branch:
+        description: "Branch to open PR from (head)"
+        required: true
+        default: "main"
+      target_branch:
+        description: "Branch to open PR into (base)"
+        required: true
+        default: "main"
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  auto-fix-and-open-pr:
+  open-pr:
     runs-on: ubuntu-latest
+    env:
+      SOURCE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && inputs.source_branch || github.ref_name }}
+      TARGET_BRANCH: ${{ github.event_name == 'workflow_dispatch' && inputs.target_branch || 'main' }}
     steps:
-      - name: Checkout main branch
+      - name: Checkout source branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ env.SOURCE_BRANCH }}
           fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: Setup Node.js for main auto-fix
+        if: ${{ env.SOURCE_BRANCH == env.TARGET_BRANCH }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - name: Install dependencies for main auto-fix
+        if: ${{ env.SOURCE_BRANCH == env.TARGET_BRANCH }}
         run: npm ci
 
-      - name: Auto-fix TypeScript lint issues
+      - name: Auto-fix TypeScript lint issues on main
+        if: ${{ env.SOURCE_BRANCH == env.TARGET_BRANCH }}
         run: npx eslint "src/**/*.{ts,tsx}" --fix
 
-      - name: Create or update pull request
+      - name: Create PR from source branch to target branch
+        if: ${{ env.SOURCE_BRANCH != env.TARGET_BRANCH }}
+        run: |
+          git fetch origin "${SOURCE_BRANCH}" "${TARGET_BRANCH}"
+          AUTO_BRANCH="automation/pr-${SOURCE_BRANCH//\//-}-to-${TARGET_BRANCH//\//-}"
+          echo "AUTO_BRANCH=${AUTO_BRANCH}" >> "$GITHUB_ENV"
+          git checkout -B "${AUTO_BRANCH}" "origin/${TARGET_BRANCH}"
+          git merge --no-ff --no-commit "origin/${SOURCE_BRANCH}"
+
+      - name: Open source branch PR to target branch
+        if: ${{ env.SOURCE_BRANCH != env.TARGET_BRANCH }}
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          branch: chore/auto-fix-typescript
-          title: 'Auto-fix TypeScript issues'
+          base: ${{ env.TARGET_BRANCH }}
+          branch: ${{ env.AUTO_BRANCH }}
+          title: "PR: ${{ env.SOURCE_BRANCH }} -> ${{ env.TARGET_BRANCH }}"
           body: |
-            This PR is automatically created from `main` to apply TypeScript auto-fixes.
+            Automatic PR opened by Olga Rubalska.
+
+            Source branch: `${{ env.SOURCE_BRANCH }}`
+            Target branch: `${{ env.TARGET_BRANCH }}`
           labels: automated-pr
-          delete-branch: true
+          delete-branch: false
+
+      - name: Create PR with TypeScript fixes to main
+        if: ${{ env.SOURCE_BRANCH == env.TARGET_BRANCH }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: ${{ env.TARGET_BRANCH }}
+          branch: chore/auto-fix-typescript
+          title: "Auto-fix TypeScript issues"
+          body: |
+            Automatic TypeScript auto-fix PR opened by Olga Rubalska.
+          labels: automated-pr
+          delete-branch: false
