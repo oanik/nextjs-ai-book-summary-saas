@@ -33,12 +33,12 @@ jobs:
         run: npx eslint "src/**/*.{ts,tsx}" --fix
 
       - name: Create or update pull request
-        uses: olga-rubalska/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: main
           branch: chore/auto-fix-typescript
-          title: "Auto-fix TypeScript issues"
+          title: 'Auto-fix TypeScript issues'
           body: |
             This PR is automatically created from `main` to apply TypeScript auto-fixes.
           labels: automated-pr
