@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next Project Test
 
-## Getting Started
+Small learning project built with `Next.js 16` and the App Router. The codebase currently mixes `TypeScript` and `JavaScript` route files and demonstrates both server-rendered and client-interactive pages.
 
-First, run the development server:
+## Stack
+
+- `Next.js 16`
+- `React 19`
+- `TypeScript 5`
+- `ESLint 9`
+- `Prettier 3`
+- `Tailwind CSS 4` installed
+
+## Project Structure
+
+- `src/app` contains App Router pages and route-local components.
+- `src/app/api/page.tsx` shows a server-rendered page with data fetching.
+- `src/app/api/ProductListClient.tsx` shows a colocated client component for interactivity.
+- `src/app/about` contains an example of route-local CSS Modules.
+- `public` stores static assets such as images.
+
+## Development
+
+Start the local dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Build the project:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run linting:
 
-## Learn More
+```bash
+npm run lint
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) in the browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Code Style
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Use single quotes and semicolons.
+- Keep trailing commas where valid.
+- Use 2 spaces for indentation.
+- Keep line length around `120` characters.
+- Use double quotes in JSX attributes.
+- Let Prettier format files on save.
+- Let ESLint auto-fix safe issues on save.
 
-## Deploy on Vercel
+## Conventions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Prefer Server Components by default in App Router pages.
+- Add `'use client';` only when state, effects, or browser-only interactivity are needed.
+- Keep reusable interactive UI in small colocated components.
+- Use `next/image` for local images.
+- Keep styling consistent with the surrounding area: CSS Modules where already used, simple classes where already used.
+- Do not perform broad refactors unless there is a specific reason.
+- Do not convert `.jsx` files to `.tsx` unless requested.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Internal Guidance
+
+General project instructions for AI-assisted edits live in `AGENTS.md`.

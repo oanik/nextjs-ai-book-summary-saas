@@ -1,0 +1,14 @@
+---
+description: General project conventions for this Next.js app
+alwaysApply: true
+---
+
+# Project Standards
+
+- This project uses `Next.js 16` App Router with `React 19`.
+- Keep pages under `src/app` and colocate small route-specific components when useful.
+- Prefer `next/image` for local images.
+- Respect the styling pattern already used nearby, such as CSS Modules or existing classes.
+- Follow the existing formatter settings: single quotes, semicolons, trailing commas, 2-space indentation, `printWidth` 120.
+- Keep changes targeted and avoid unnecessary refactors.
+- Check `AGENTS.md` for fuller project guidance when a task needs more context.

@@ -1,0 +1,146 @@
+---
+description: Frontend standards for TypeScript, React, and Next.js App Router
+globs: src/**/*.{js,jsx,ts,tsx}
+alwaysApply: false
+---
+
+# Frontend Standards
+
+## General Rules
+
+- Use strict TypeScript (`strict: true`) and avoid `any`. Use `unknown` when needed.
+- Prefer explicit types over implicit inference for public APIs.
+- Use ES modules only (`import` / `export`).
+- Prefer named exports over default exports.
+- Keep files under ~200–300 lines; split when complexity grows.
+- Use clear, intention-revealing names (no abbreviations like `tmp`, `data2`).
+- Avoid side effects outside React lifecycle or server boundaries.
+
+---
+
+## React Rules
+
+- Use functional components only.
+- Use hooks instead of classes.
+- Keep components focused on a single responsibility.
+- Extract reusable logic into custom hooks (`useX`).
+- Avoid prop drilling → use context or composition.
+- Keep JSX mostly presentational:
+  - Move logic, mapping, and transformations outside JSX.
+- Avoid inline function definitions inside JSX when possible (performance + readability).
+- Prefer controlled components for forms unless performance dictates otherwise.
+
+---
+
+## Next.js (App Router) Rules
+
+- Use App Router (`src/app`) conventions only.
+- Default to **Server Components**.
+- Add `'use client'` only when required:
+  - state (`useState`)
+  - effects (`useEffect`)
+  - refs (`useRef`)
+  - event handlers
+  - browser APIs
+- Never mark large trees as client unnecessarily.
+- Prefer **Server Actions** over API routes for mutations.
+- Fetch data in Server Components whenever possible.
+- Avoid duplicate data fetching between server and client.
+- Use `generateMetadata` instead of manual `<head>` handling.
+
+---
+
+## Component Architecture
+
+- Separate:
+  - UI (presentation)
+  - logic (hooks)
+  - data (fetching / transformations)
+- Prefer composition over inheritance.
+- Co-locate component + styles + tests when reasonable.
+- Keep components “dumb” and move orchestration upward.
+
+---
+
+## State Management
+
+- Use local state first (`useState`).
+- Use derived state instead of duplicating data.
+- Use `useMemo` only when necessary (not by default).
+- Use global state (Zustand, context) only when truly shared.
+- Avoid deeply nested state objects.
+
+---
+
+## Performance
+
+- Use dynamic imports (`next/dynamic`) for:
+  - heavy components
+  - rarely used UI (modals, charts, maps)
+- Avoid unnecessary re-renders:
+  - stable props
+  - memoization when needed
+- Keep client bundles minimal.
+- Avoid large dependencies in Client Components.
+- Use `Suspense` + streaming for async UI.
+
+---
+
+## Imports
+
+- Use `@/` alias for internal modules.
+- Avoid deep relative imports (`../../../../`).
+- Keep relative imports only for same-folder files.
+- Keep imports extensionless.
+- Group imports:
+  1. external libs
+  2. internal modules
+  3. styles/assets
+
+---
+
+## Styling
+
+- Use consistent styling approach (e.g., Tailwind / CSS Modules).
+- Avoid inline styles unless dynamic.
+- Prefer utility-first or scoped styles over global CSS.
+- Keep classNames readable (avoid huge inline strings).
+
+---
+
+## Accessibility (A11y)
+
+- Use semantic HTML (`button`, `nav`, `main`, etc.).
+- Always include:
+  - `alt` for images
+  - labels for inputs
+- Ensure keyboard navigation works.
+- Avoid divs with click handlers when a button is appropriate.
+
+---
+
+## Error Handling
+
+- Handle loading, empty, and error states explicitly.
+- Use error boundaries where appropriate.
+- Never silently fail API/data logic.
+
+---
+
+## Testing (optional but recommended)
+
+- Test behavior, not implementation.
+- Prefer integration tests over shallow tests.
+- Cover critical flows (forms, navigation, mutations).
+
+---
+
+## Validation Rule
+
+Before finalizing:
+
+- ✅ Component is minimal and focused
+- ✅ Server vs Client decision is justified
+- ✅ No unnecessary state or effects
+- ✅ Imports and structure follow standards
+- ✅ Performance risks reviewed
