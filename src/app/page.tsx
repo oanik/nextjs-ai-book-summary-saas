@@ -1,4 +1,3 @@
-import React from 'react';
 import Link from 'next/link';
 
 const HomePage = () => {
@@ -20,14 +19,11 @@ const HomePage = () => {
                 </span>
               </Link>
               <div className="flex items-center space-x-6">
-                <Link href="/login" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
-                  Sign In
-                </Link>
                 <Link
-                  href="/register"
+                  href="/login"
                   className="px-6 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600  text-white rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
                 >
-                  Get Started Free
+                  Sign In
                 </Link>
               </div>
             </div>
@@ -51,20 +47,6 @@ const HomePage = () => {
             <p className="text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
               Get key insights from bestselling books. Read or listen anytime, anywhere.
             </p>
-            <div className="flex gap-4 justify-center mb-16">
-              <Link
-                href="/register"
-                className="px-10 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg rounded-xl font-bold shadow-2xl hover:shadow-indigo-500/50 transform hover:scale-105 transition-all"
-              >
-                Start Free Today
-              </Link>
-              <Link
-                href="/books"
-                className="px-10 py-5 bg-white border-2 border-gray-300 text-gray-900 text-lg rounded-xl font-bold hover:border-indigo-400 hover:bg-gray-50 transition-all"
-              >
-                Browse Library
-              </Link>
-            </div>
             <div className="grid grid-cols-3 gap-12 max-w-3xl mx-auto pt-12 border-t-2 border-gray-200">
               <div>
                 <div className="text-4xl font-black text-indigo-600">1000+</div>
@@ -159,12 +141,6 @@ const HomePage = () => {
             <p className="text-2xl text-indigo-100 mb-12 max-w-2xl mx-auto">
               Join thousands growing their knowledge daily
             </p>
-            <Link
-              href="/register"
-              className="inline-block px-12 py-6 bg-white text-indigo-600 text-xl rounded-xl font-bold shadow-2xl hover:shadow-white/30 transform hover:scale-105 transition-all"
-            >
-              Get Started Free
-            </Link>
           </div>
         </section>
       </main>
