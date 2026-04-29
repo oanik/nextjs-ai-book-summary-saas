@@ -1,5 +1,6 @@
 import { DefaultSession } from 'next-auth';
-import { SubscriptionTier, UserRole } from '@prisma/client';
+
+import type { SubscriptionTier, UserRole } from '../prisma/generated/prisma/client';
 
 declare module 'next-auth' {
   interface Session {

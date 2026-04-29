@@ -27,17 +27,20 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    // Keep the traced path limited to the uploads subtree for Turbopack/NFT.
+    const uploadsRoot = join(/*turbopackIgnore: true*/ process.cwd(), 'public', 'uploads');
+
     let uploadDir: string;
     let urlPath: string;
 
     if (type === 'cover') {
-      uploadDir = join(process.cwd(), 'public', 'uploads', 'covers');
+      uploadDir = join(uploadsRoot, 'covers');
       urlPath = 'covers';
     } else if (type === 'pdf') {
-      uploadDir = join(process.cwd(), 'public', 'uploads', 'pdfs');
+      uploadDir = join(uploadsRoot, 'pdfs');
       urlPath = 'pdfs';
     } else if (type === 'payment_proof') {
-      uploadDir = join(process.cwd(), 'public', 'uploads', 'payment_proofs');
+      uploadDir = join(uploadsRoot, 'payment_proofs');
       urlPath = 'payment_proofs';
     } else {
       return NextResponse.json({ error: 'Invalid file type' }, { status: 400 });

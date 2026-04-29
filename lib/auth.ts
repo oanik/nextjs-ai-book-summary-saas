@@ -1,10 +1,10 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { SubscriptionTier, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 
+import type { SubscriptionTier, UserRole } from '../prisma/generated/prisma/client';
 import { prisma } from './db/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
