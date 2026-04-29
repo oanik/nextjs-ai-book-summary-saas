@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/pre-commit-format-check.sh",
+        "matcher": "^git commit(?:\\s|$)",
+        "failClosed": true
+      }
+    ]
+  }
+}

@@ -50,6 +50,25 @@ alwaysApply: false
 
 ---
 
+## Run Frontend Locally
+
+- Run commands from project root:
+  - `cd /Users/olgarubalska/Desktop/NextJS_test_project/BookWise`
+- Install dependencies:
+  - `npm install`
+- Start dev server:
+  - `npm run dev`
+- Open app in browser:
+  - `http://localhost:3000`
+- Build for production:
+  - `npm run build`
+- Run production server:
+  - `npm run start`
+- Stop frontend server:
+  - `Ctrl + C` in the same terminal.
+
+---
+
 ## Component Architecture
 
 - Separate:

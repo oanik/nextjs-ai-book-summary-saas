@@ -1,0 +1,375 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+datasource db {
+  provider = "mysql"
+}
+/* =====================
+   USER
+===================== */
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   @map("password_hash")
+  fullName  String   @map("full_name")
+
+  role      UserRole @default(USER)
+
+  subscriptionTier        SubscriptionTier   @default(FREE) @map("subscription_tier")
+  subscriptionStatus      SubscriptionStatus @default(INACTIVE) @map("subscription_status")
+  subscriptionStartDate   DateTime? @map("subscription_start_date")
+  subscriptionEndDateTime DateTime? @map("subscription_end_date_time")
+
+  stripeCustomerId     String? @map("stripe_customer_id")
+  stripeSubscriptionId String? @map("stripe_subscription_id")
+
+  audioListenTime Int @default(0) @map("audio_listen_time")
+  emailVerified   Boolean @default(false) @map("email_verified")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  booksCreated        Book[] @relation("BooksCreatedByUser")
+  reviews             BookReview[]
+  favorites           UserFavorite[]
+  readingHistory      UserReadingHistory[]
+  paymentTransactions PaymentTransaction[]
+  subscriptionsOrders SubscriptionOrder[]
+  adminActivityLogs   AdminActivityLog[]
+
+  @@map("users")
+}
+
+/* =====================
+   CATEGORY
+===================== */
+
+model Category {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  slug         String   @unique
+  description  String?  @db.Text
+  icon         String?
+
+  displayOrder Int     @default(0) @map("display_order")
+  isActive     Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books Book[]
+
+  @@map("categories")
+}
+
+/* =====================
+   BOOK
+===================== */
+
+model Book {
+  id          Int    @id @default(autoincrement())
+  title       String
+  slug        String @unique
+  author      String
+
+  categoryId Int @map("category_id")
+  createdById String @map("created_by")
+
+  description       String? @db.Text
+  coverImageUrl     String? @map("cover_image_url")
+  originalPdfUrl    String? @map("original_pdf_url")
+  originalPdfPath   String? @map("original_pdf_path")
+
+  publicationYear Int? @map("publication_year")
+  isbn            String?
+
+  readingTimeMinutes Int @default(15) @map("reading_time_minutes")
+  totalAudioDuration Int @default(0) @map("total_audio_duration")
+
+  averageRating Decimal @default(0.00) @db.Decimal(3,2) @map("average_rating")
+  totalReviews  Int @default(0) @map("total_reviews")
+
+  viewCount Int @default(0) @map("view_count")
+
+  isFeatured       Boolean @default(false) @map("is_featured")
+  isPublished      Boolean @default(false) @map("is_published")
+  summaryGenerated Boolean @default(false) @map("summary_generated")
+  audioGenerated   Boolean @default(false) @map("audio_generated")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  category  Category @relation(fields: [categoryId], references: [id])
+  createdBy User @relation("BooksCreatedByUser", fields: [createdById], references: [id])
+
+  summary        BookSummary?
+  chapters       BookChapter[]
+  reviews        BookReview[]
+  favorites      UserFavorite[]
+  readingHistory UserReadingHistory[]
+
+  @@index([categoryId])
+  @@index([createdById])
+  @@index([slug])
+  @@map("books")
+}
+
+/* =====================
+   BOOK SUMMARY
+===================== */
+
+model BookSummary {
+  id Int @id @default(autoincrement())
+
+  bookId Int @unique @map("book_id")
+
+  mainSummary String? @db.Text @map("main_summary")
+  keyTakeaways Json? @map("key_takeaways")
+  fullSummary  String? @db.LongText @map("full_summary")
+  tableOfContents Json? @map("table_of_contents")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("book_summaries")
+}
+
+/* =====================
+   BOOK CHAPTER
+===================== */
+
+model BookChapter {
+  id Int @id @default(autoincrement())
+
+  bookId Int @map("book_id")
+
+  chapterNumber Int @map("chapter_number")
+  chapterTitle  String @map("chapter_title")
+
+  chapterSummary String @db.LongText @map("chapter_summary")
+
+  audioUrl      String? @map("audio_url")
+  audioDuration Int @default(0) @map("audio_duration")
+
+  displayOrder Int @default(0) @map("display_order")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@map("book_chapters")
+}
+
+/* =====================
+   REVIEW (fixed relation name)
+===================== */
+
+model BookReview {
+  id Int @id @default(autoincrement())
+
+  bookId Int @map("book_id")
+  userId String @map("user_id")
+
+  rating Int
+
+  reviewTitle String? @map("review_title")
+  reviewText  String? @db.Text @map("review_text")
+
+  isVerifiedPurchase Boolean @default(false)
+  isApproved Boolean @default(true)
+
+  helpfulCount Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, userId])
+  @@index([bookId])
+  @@index([userId])
+  @@map("book_reviews")
+}
+
+/* =====================
+   FAVORITES
+===================== */
+
+model UserFavorite {
+  id Int @id @default(autoincrement())
+
+  userId String @map("user_id")
+  bookId Int @map("book_id")
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@map("user_favorites")
+}
+
+/* =====================
+   READING HISTORY
+===================== */
+
+model UserReadingHistory {
+  id Int @id @default(autoincrement())
+
+  userId String @map("user_id")
+  bookId Int @map("book_id")
+
+  lastAccessed DateTime @default(now())
+
+  completionPercentage Int @default(0)
+  audioPosition Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@map("user_reading_history")
+}
+
+/* =====================
+   ENUMS
+===================== */
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum PlanType {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum SettingType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+// 10. Payment Transactions Table
+model PaymentTransaction {
+  id                    Int           @id @default(autoincrement())
+  userId                String        @map("user_id")
+  stripePaymentIntentId String?       @map("stripe_payment_intent_id")
+  amount                Decimal       @db.Decimal(10, 2)
+  currency              String        @default("USD")
+  paymentStatus         PaymentStatus @map("payment_status")
+  planType              PlanType      @map("plan_type")
+  metadata              Json?
+  // Additional payment metadata
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("payment_transactions")
+}
+
+// 10b. Subscription Orders Table (Bank Transfer)
+model SubscriptionOrder {
+  id                   Int         @id @default(autoincrement())
+  userId               String      @map("user_id")
+  planType             PlanType    @map("plan_type")
+  amount               Decimal     @db.Decimal(10, 2)
+  currency             String      @default("USD")
+  paymentMethod        String      @default("BANK_TRANSFER") @map("payment_method")
+  paymentProofUrl      String?     @map("payment_proof_url") // Screenshot/receipt upload
+  transactionReference String?     @map("transaction_reference") // User-provided reference
+  orderStatus          OrderStatus @default(PENDING) @map("order_status")
+  approvedBy           String?     @map("approved_by") // Admin ID who approved
+  approvedAt           DateTime?   @map("approved_at")
+  rejectedReason       String?     @db.Text @map("rejected_reason")
+  notes                String?     @db.Text // Admin notes
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user                 User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orderStatus])
+  @@map("subscription_orders")
+}
+
+// 11. Admin Activity Logs Table
+model AdminActivityLog {
+  id          Int      @id @default(autoincrement())
+  adminId     String   @map("admin_id")
+  actionType  String   @map("action_type")
+  targetType  String   @map("target_type") // 'book', 'category', 'user', etc.
+  targetId    Int?     @map("target_id")
+  description String?  @db.Text
+  ipAddress   String?  @map("ip_address")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  admin User @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@map("admin_activity_logs")
+}
+
+  // 12. System Settings Table
+model SystemSetting {
+  id           Int         @id @default(autoincrement())
+  settingKey   String      @unique @map("setting_key")
+  settingValue String      @db.Text @map("setting_value")
+  settingType  SettingType @map("setting_type")
+  description  String?     @db.Text @map("description")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+

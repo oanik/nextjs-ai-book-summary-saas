@@ -4,6 +4,12 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
-  }
+    "source.fixAll.eslint": "always",
+    "source.addMissingImports": "never",
+    "source.organizeImports": "never"
+  },
+  "typescript.suggest.autoImports": true,
+  "javascript.suggest.autoImports": true,
+  "css.validate": false,
+  "scss.validate": false
 }

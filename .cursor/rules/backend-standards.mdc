@@ -1,0 +1,55 @@
+---
+description: Backend conventions for Prisma and Docker workflow
+alwaysApply: true
+---
+
+# Backend Standards
+
+## Prisma Config (Prisma 7)
+
+- Keep datasource connection URL in `prisma.config.ts`, not in `prisma/schema.prisma`.
+- `prisma/schema.prisma` datasource block should keep only the provider:
+  - `datasource db { provider = "mysql" }`
+- `prisma.config.ts` must load envs and set datasource URL:
+  - `import 'dotenv/config';`
+  - `datasource: { url: process.env.DATABASE_URL as string }`
+
+## Environment
+
+- Keep `DATABASE_URL` in `.env` using local Docker MySQL:
+  - `DATABASE_URL="mysql://root:root@localhost:3306/bookwise"`
+
+## Docker Database Workflow
+
+- Run all Docker commands from app root:
+  - `cd /Users/olgarubalska/Desktop/NextJS_test_project/BookWise`
+- Start MySQL in background: `docker compose up -d`
+- Check running services: `docker compose ps`
+- View MySQL logs: `docker compose logs -f mysql`
+- Restart MySQL service: `docker compose restart mysql`
+- Stop services (keep DB volume): `docker compose down`
+- Full reset (remove DB data too): `docker compose down -v`
+- MySQL service is defined in `docker-compose.yml` in project root (`BookWise`).
+
+## Prisma Workflow
+
+- Run backend commands from app root:
+  - `cd /Users/olgarubalska/Desktop/NextJS_test_project/BookWise`
+- Install deps after Prisma version changes: `npm install`
+- Check Prisma versions: `npx prisma -v`
+- Push schema changes (preferred): `npm run db:push`
+- Push schema changes (direct, explicit config): `npx prisma db push --config=./prisma.config.ts --skip-generate`
+- Open Studio (preferred): `npm run db:studio`
+- Open Studio (direct): `npx prisma studio --config=./prisma.config.ts --browser none`
+- Validate schema/config quickly: `npx prisma validate --config=./prisma.config.ts`
+- Stop Studio: `Ctrl + C` in the same terminal.
+- Keep Prisma versions aligned:
+  - `prisma` (devDependency) and `@prisma/client` must use the same major version.
+
+## Debug Checklist
+
+- If DB connection fails, verify Docker container is up and port `3306` is mapped.
+- If Studio/CLI complains about datasource URL, confirm `prisma.config.ts` exists and `DATABASE_URL` is set.
+- If Studio fails with "Config file not found", you are likely running from the wrong folder; run inside `BookWise`.
+- If Studio fails with `EADDRINUSE`, do not force a fixed port; use `npm run db:studio` and open the printed URL.
+- If Studio fails but schema/config looks correct, check Prisma major versions with `npx prisma -v`.
