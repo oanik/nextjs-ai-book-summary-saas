@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-screen bg-gray-200">
+    <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="px-4 py-3">
