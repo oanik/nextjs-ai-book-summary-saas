@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log*
+.next
+build
+.git
+.github
+.cursor
+.DS_Store
+coverage
+.env*
+README.md
+docs
+deploy/.env.production
+public/uploads
+storage/book-text

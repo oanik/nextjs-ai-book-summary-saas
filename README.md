@@ -41,6 +41,30 @@ npm run lint
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
 
+## Deployment
+
+The repository now includes a free-friendly production deployment path for the current architecture:
+
+- `Oracle Cloud Always Free VM`
+- `Docker Compose`
+- `GitHub Actions`
+- `Caddy` for HTTPS
+
+Deployment guides:
+
+- `docs/deployment/oracle-free-vm.md`
+- `docs/deployment/mysql-move-to-oracle.md`
+- `docs/deployment/serverless-storage-migration.md`
+
+Production assets included in the repo:
+
+- `Dockerfile`
+- `docker-compose.prod.yml`
+- `deploy/Caddyfile`
+- `deploy/.env.production.example`
+- `.github/workflows/deploy-production.yml`
+- `scripts/deploy-production.sh`
+
 ## Code Style
 
 - Use single quotes and semicolons.

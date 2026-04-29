@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-import { auth } from './lib/auth';
+export default async function middleware(req: NextRequest) {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth?.user;
+  const isLoggedIn = !!token;
   const isAuthPage = req.nextUrl.pathname.startsWith('/login');
 
   if (!isLoggedIn && !isAuthPage) {
@@ -11,8 +15,10 @@ export default auth((req) => {
     loginURL.searchParams.set('callbackUrl', req.nextUrl.pathname);
     return NextResponse.redirect(loginURL);
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/api/auth/user/:path*', '/favourites/:path*'],
+  matcher: ['/dashboard/:path*', '/favourites/:path*'],
 };

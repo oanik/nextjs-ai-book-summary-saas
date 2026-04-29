@@ -1,0 +1,60 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookwise-app
+    restart: unless-stopped
+    env_file:
+      - deploy/.env.production
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/public/uploads
+      - extracted_book_text:/app/storage/book-text
+    expose:
+      - '3000'
+
+  mysql:
+    image: mysql:8.0
+    container_name: bookwise-mysql-prod
+    restart: unless-stopped
+    env_file:
+      - deploy/.env.production
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: bookwise-caddy
+    restart: unless-stopped
+    env_file:
+      - deploy/.env.production
+    depends_on:
+      - app
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  mysql_data:
+  uploads_data:
+  extracted_book_text:
+  caddy_data:
+  caddy_config:

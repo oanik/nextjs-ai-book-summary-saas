@@ -5,6 +5,8 @@ import { join } from 'path';
 
 import { auth } from '../../../../../lib/auth';
 
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
