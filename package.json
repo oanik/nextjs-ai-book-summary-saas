@@ -6,7 +6,7 @@
     "dev": "next dev --webpack",
     "prebuild": "prisma generate --config=./prisma.config.ts",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p ${PORT:-3000}",
     "prepare": "husky",
     "format:check": "prettier --check .",
     "lint": "eslint",
