@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import NextAuth from 'next-auth';
 
-export default async function middleware(req: NextRequest) {
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
-  });
+import { authConfig } from './lib/auth.config';
 
-  const isLoggedIn = !!token;
+const { auth } = NextAuth(authConfig);
+
+export default auth((req: NextRequest & { auth: unknown }) => {
+  const isLoggedIn = !!req.auth;
   const isAuthPage = req.nextUrl.pathname.startsWith('/login');
 
   if (!isLoggedIn && !isAuthPage) {
@@ -17,7 +17,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ['/dashboard/:path*', '/favourites/:path*'],

@@ -1,27 +1,19 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 
 import type { SubscriptionTier, UserRole } from '../prisma/generated/prisma/client';
+import { authConfig } from './auth.config';
 import { prisma } from './db/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
+  ...authConfig,
   session: {
     strategy: 'jwt',
   },
-  pages: {
-    signIn: '/login',
-    signOut: '/logout',
-    error: '/login',
-  },
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
+    ...authConfig.providers,
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
