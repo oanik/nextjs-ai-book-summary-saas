@@ -75,16 +75,13 @@ async function main() {
   console.log(`\n${bold('Staged files')} (${fileList.length}):`);
   fileList.forEach((f) => console.log(`  ${dim('▸')} ${f}`));
 
-  // Run ESLint on staged JS/TS files before doing anything else
-  const lintableFiles = fileList.filter((f) => /\.(js|jsx|ts|tsx|mjs|cjs)$/.test(f));
-  if (lintableFiles.length > 0) {
-    console.log(`\n${dim('Running ESLint…')}`);
-    const lintResult = spawnSync('npx', ['eslint', '--max-warnings=0', ...lintableFiles], { stdio: 'inherit' });
-    if (lintResult.status !== 0) {
-      console.error('\n  ESLint failed. Fix the errors above before committing.\n');
-      process.exit(lintResult.status ?? 1);
-    }
-    console.log('  ESLint passed.');
+  // Run the pre-commit checks (secret scan, Prettier, ESLint) before calling OpenAI,
+  // so we don't waste an API call on code that won't pass the hook anyway.
+  console.log(`\n${dim('Running pre-commit checks…')}`);
+  const hookResult = spawnSync('bash', ['scripts/pre-commit-checks.sh'], { stdio: 'inherit' });
+  if (hookResult.status !== 0) {
+    console.error('\n  Pre-commit checks failed. Fix the issues above before committing.\n');
+    process.exit(hookResult.status ?? 1);
   }
 
   // Grab the diff (truncated to keep token costs low)
