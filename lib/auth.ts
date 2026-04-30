@@ -7,15 +7,6 @@ import { randomUUID } from 'crypto';
 import type { SubscriptionTier, UserRole } from '../prisma/generated/prisma/client';
 import { prisma } from './db/prisma';
 
-console.log('[auth-debug]', {
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  AUTH_URL: process.env.AUTH_URL,
-  AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
-  PORT: process.env.PORT,
-  HOSTNAME: process.env.HOSTNAME,
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID?.slice(0, 20) + '...',
-});
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: 'jwt',
