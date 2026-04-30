@@ -16,7 +16,6 @@ permissions:
 jobs:
   validate-and-deploy:
     runs-on: ubuntu-latest
-    environment: production
     env:
       DATABASE_URL: mysql://bookwise:bookwise@127.0.0.1:3306/bookwise
       GOOGLE_CLIENT_ID: ci-placeholder-client-id
@@ -42,15 +41,3 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Configure SSH
-        run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
-
-      - name: Deploy to Oracle Cloud VM
-        run: |
-          ssh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "export REPO_DIR='${{ secrets.DEPLOY_PATH }}' BRANCH='${{ github.ref_name }}'; bash '${{ secrets.DEPLOY_PATH }}/scripts/deploy-production.sh'"
