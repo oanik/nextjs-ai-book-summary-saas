@@ -75,6 +75,18 @@ async function main() {
   console.log(`\n${bold('Staged files')} (${fileList.length}):`);
   fileList.forEach((f) => console.log(`  ${dim('▸')} ${f}`));
 
+  // Run ESLint on staged JS/TS files before doing anything else
+  const lintableFiles = fileList.filter((f) => /\.(js|jsx|ts|tsx|mjs|cjs)$/.test(f));
+  if (lintableFiles.length > 0) {
+    console.log(`\n${dim('Running ESLint…')}`);
+    const lintResult = spawnSync('npx', ['eslint', '--max-warnings=0', ...lintableFiles], { stdio: 'inherit' });
+    if (lintResult.status !== 0) {
+      console.error('\n  ESLint failed. Fix the errors above before committing.\n');
+      process.exit(lintResult.status ?? 1);
+    }
+    console.log('  ESLint passed.');
+  }
+
   // Grab the diff (truncated to keep token costs low)
   let diff = run('git diff --cached --unified=3 --no-color --diff-filter=ACMRD');
   if (diff.length > MAX_DIFF_CHARS) {
