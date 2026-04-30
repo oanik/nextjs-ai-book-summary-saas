@@ -29,11 +29,12 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app ./
 
-EXPOSE ${PORT:-3000}
+EXPOSE 3000
 
 CMD ["npm", "run", "start"]

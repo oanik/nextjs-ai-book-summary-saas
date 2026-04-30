@@ -19,7 +19,7 @@ secret_check=$(STAGED_FILES="$staged_files_text" STAGED_DIFF="$staged_diff" node
 const files = (process.env.STAGED_FILES || '').split('\n').map((value) => value.trim()).filter(Boolean);
 const diff = process.env.STAGED_DIFF || '';
 
-const blockedFilePattern = /(^|\/)\.env(\.(?!example$|sample$|template$)[^/]+)?$/i;
+const blockedFilePattern = /(^|\/)\.env(?![^/]*\.(example|sample|template)$)[^/]*$/i;
 const blockedFiles = files.filter((file) => blockedFilePattern.test(file));
 
 const secretPatterns = [

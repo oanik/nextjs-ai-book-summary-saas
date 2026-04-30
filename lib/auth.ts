@@ -8,6 +8,7 @@ import type { SubscriptionTier, UserRole } from '../prisma/generated/prisma/clie
 import { prisma } from './db/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   session: {
     strategy: 'jwt',
   },
