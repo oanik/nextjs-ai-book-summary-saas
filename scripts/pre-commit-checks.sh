@@ -13,11 +13,14 @@ if [ "${#staged_files[@]}" -eq 0 ]; then
 fi
 
 staged_files_text=$(printf '%s\n' "${staged_files[@]}")
-staged_diff=$(git diff --cached --unified=0 --no-color --diff-filter=ACMR)
+staged_diff_file=$(mktemp)
+trap 'rm -f "$staged_diff_file"' EXIT
+git diff --cached --unified=0 --no-color --diff-filter=ACMR > "$staged_diff_file"
 
-secret_check=$(STAGED_FILES="$staged_files_text" STAGED_DIFF="$staged_diff" node <<'NODE'
+secret_check=$(STAGED_FILES="$staged_files_text" STAGED_DIFF_FILE="$staged_diff_file" node <<'NODE'
+const fs = require('fs');
 const files = (process.env.STAGED_FILES || '').split('\n').map((value) => value.trim()).filter(Boolean);
-const diff = process.env.STAGED_DIFF || '';
+const diff = fs.readFileSync(process.env.STAGED_DIFF_FILE, 'utf8');
 
 const blockedFilePattern = /(^|\/)\.env(?![^/]*\.(example|sample|template)$)[^/]*$/i;
 const blockedFiles = files.filter((file) => blockedFilePattern.test(file));

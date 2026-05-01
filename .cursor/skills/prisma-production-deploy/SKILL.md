@@ -29,13 +29,13 @@ Common triggers:
    1. `Table/model name?`
    2. `Which column do you want to add/update/remove first?`
    3. `Do you want to add another column? (proceed/done)`
-   Repeat step 3 until user says `done`.
+      Repeat step 3 until user says `done`.
 3. If the user says "new table release", ask these questions one after another:
    1. `Table/model name?`
    2. `First column + type?`
    3. `Do you want to add another column? (proceed/done)`
-   Repeat step 3 until user says `done`.
-   Then ask: `Relations (optional)?`
+      Repeat step 3 until user says `done`.
+      Then ask: `Relations (optional)?`
 4. Before running deploy commands, always ask:
 
 ```text
