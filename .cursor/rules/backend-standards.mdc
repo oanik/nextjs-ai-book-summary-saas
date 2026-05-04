@@ -38,7 +38,7 @@ alwaysApply: true
 - Install deps after Prisma version changes: `npm install`
 - Check Prisma versions: `npx prisma -v`
 - Push schema changes (preferred): `npm run db:push`
-- Push schema changes (direct, explicit config): `npx prisma db push --config=./prisma.config.ts --skip-generate`
+- Push schema changes (direct, explicit config): `npx prisma db push --config=./prisma.config.ts`
 - Open Studio (preferred): `npm run db:studio`
 - Open Studio (direct): `npx prisma studio --config=./prisma.config.ts --browser none`
 - Validate schema/config quickly: `npx prisma validate --config=./prisma.config.ts`

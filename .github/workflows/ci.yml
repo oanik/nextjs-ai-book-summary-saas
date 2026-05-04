@@ -55,7 +55,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Push DB schema
-        run: npx prisma db push --config=./prisma.config.ts --skip-generate
+        run: npx prisma db push --config=./prisma.config.ts
 
       - name: Build
         run: npm run build
