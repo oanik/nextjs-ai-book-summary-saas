@@ -6,6 +6,16 @@
         "command": "bash .cursor/hooks/pre-commit-format-check.sh",
         "matcher": "^git commit(?:\\s|$)",
         "failClosed": true
+      },
+      {
+        "command": "bash .cursor/hooks/block-env-shell-access.sh",
+        "failClosed": true
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": "bash .cursor/hooks/block-env-read.sh",
+        "failClosed": true
       }
     ]
   }
