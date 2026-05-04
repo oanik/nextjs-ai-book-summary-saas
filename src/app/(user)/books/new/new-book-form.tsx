@@ -5,10 +5,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-type CategoryOption = {
-  id: number;
-  name: string;
-};
+import { createBook, generateSummary, uploadUserFile } from '../../../../features/books/api/client';
+import type { CategoryOption } from '../../../../features/books/model/types';
 
 type NewBookFormProps = {
   categories: CategoryOption[];
@@ -86,13 +84,7 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
     setSummaryProgress('Extracting text from PDF...');
 
     try {
-      const response = await fetch('/api/user/books/generate-summary', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ bookId }),
-      });
+      const response = await generateSummary(bookId);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Failed to generate summary' }));
@@ -148,62 +140,39 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
       let pdfPath = '';
 
       if (coverImageFile) {
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', coverImageFile);
-        uploadFormData.append('type', 'cover');
+        const data = await uploadUserFile(coverImageFile, 'cover');
 
-        const uploadResponse = await fetch('/api/user/upload', {
-          method: 'POST',
-          body: uploadFormData,
-        });
-
-        if (uploadResponse.ok) {
-          const data = await uploadResponse.json();
+        if (data) {
           coverImageUrl = data.url;
         }
       }
 
       if (pdfFile) {
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', pdfFile);
-        uploadFormData.append('type', 'pdf');
+        const data = await uploadUserFile(pdfFile, 'pdf');
 
-        const uploadResponse = await fetch('/api/user/upload', {
-          method: 'POST',
-          body: uploadFormData,
-        });
-
-        if (uploadResponse.ok) {
-          const data = await uploadResponse.json();
+        if (data) {
           pdfUrl = data.url;
-          pdfPath = data.path;
+          pdfPath = data.path ?? '';
         }
       }
 
-      const response = await fetch('/api/user/books', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          author: formData.author,
-          categoryId: Number.parseInt(formData.categoryId, 10),
-          description: formData.description,
-          publicationYear: formData.publicationYear ? Number.parseInt(formData.publicationYear, 10) : null,
-          isbn: formData.isbn || null,
-          tags: formData.tags || null,
-          coverImageUrl: coverImageUrl || null,
-          pdfUrl: pdfUrl || null,
-          pdfPath: pdfPath || null,
-          isFeatured: formData.isFeatured,
-          isPublished: formData.isPublished,
-        }),
+      const result = await createBook({
+        title: formData.title,
+        author: formData.author,
+        categoryId: Number.parseInt(formData.categoryId, 10),
+        description: formData.description,
+        publicationYear: formData.publicationYear ? Number.parseInt(formData.publicationYear, 10) : null,
+        isbn: formData.isbn || null,
+        tags: formData.tags || null,
+        coverImageUrl: coverImageUrl || null,
+        pdfUrl: pdfUrl || null,
+        pdfPath: pdfPath || null,
+        isFeatured: formData.isFeatured,
+        isPublished: formData.isPublished,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
+      if (!result.ok) {
+        const data = result.data;
         if (data.errors) {
           setErrors(data.errors);
         } else {
@@ -213,7 +182,7 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
         return;
       }
 
-      setBookId(data.id);
+      setBookId(result.data.id);
       setLoading(false);
       toast.success('Book created successfully! You can now generate summary and audio');
     } catch {

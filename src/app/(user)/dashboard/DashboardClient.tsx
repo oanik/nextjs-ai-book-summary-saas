@@ -1,8 +1,9 @@
 'use client';
+import React from 'react';
 import { use } from 'react';
 import Link from 'next/link';
 
-import { dashboardHelpers } from './helpers';
+import { dashboardHelpers } from '../../../features/dashboard/lib/helpers';
 
 export interface User {
   id: string;

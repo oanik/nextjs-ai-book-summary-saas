@@ -2,10 +2,10 @@ import React, { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 
 import { auth } from '../../../../lib/auth';
+import { getDashboardUser } from '../../../features/dashboard/model/getDashboardUser';
+import { getSubscriptionOrders } from '../../../features/dashboard/model/getSubscriptionOrders';
 import DashboardClient from './DashboardClient';
 import DashboardSkeleton from './DashboardSkeleton';
-import { getDashboardUser } from './queries/getDashboardUser';
-import { getSubscriptionOrders } from './queries/getSubscriptionOrders';
 
 const DashboardPage = async () => {
   const session = await auth();

@@ -6,38 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
-interface Chapter {
-  id: number;
-  chapterNumber: number;
-  chapterTitle: string;
-  chapterSummary: string;
-  audioUrl: string | null;
-  audioDuration: number;
-}
-
-interface Summary {
-  mainSummary: string;
-  tableOfContents: unknown;
-}
-
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  description: string;
-  publicationYear: number | null;
-  isbn: string | null;
-  coverImageUrl: string | null;
-  isFeatured: boolean;
-  isPublished: boolean;
-  summaryGenerated: boolean;
-  audioGenerated: boolean;
-  category: {
-    name: string;
-  };
-  summary: Summary | null;
-  chapters: Chapter[];
-}
+import { fetchBookDetails } from '../../../../../features/books/api/client';
+import type { BookDetails } from '../../../../../features/books/model/types';
 
 export default function BookDetailsPage() {
   const router = useRouter();
@@ -45,7 +15,7 @@ export default function BookDetailsPage() {
   const bookId = params.id;
 
   const [loading, setLoading] = useState(true);
-  const [book, setBook] = useState<Book | null>(null);
+  const [book, setBook] = useState<BookDetails | null>(null);
   const [currentAudio, setCurrentAudio] = useState<number | null>(null);
 
   useEffect(() => {
@@ -55,9 +25,8 @@ export default function BookDetailsPage() {
 
     async function fetchBook() {
       try {
-        const response = await fetch(`/api/user/books/${bookId}/details`);
-        if (response.ok) {
-          const data = await response.json();
+        const data = await fetchBookDetails(bookId);
+        if (data) {
           setBook(data);
         }
       } catch (error) {

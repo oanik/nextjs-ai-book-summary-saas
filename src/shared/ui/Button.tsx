@@ -25,7 +25,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg not-even:text-gray-700 hover:text-indigo-600 font-medium transition-colors"
+      className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg not-even:text-gray-700 hover:text-indigo-600 transition-colors"
     >
       {hasIconStart && <span className="flex items-center">{hasIconStart}</span>}
       {label}
