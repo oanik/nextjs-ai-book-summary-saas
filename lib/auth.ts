@@ -75,14 +75,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
     async jwt({ token, user }) {
-      if (user?.email) {
-        token.email = user.email;
-      }
-
-      if (!token.email) return token;
+      if (!user?.email) return token;
 
       const dbUser = await prisma.user.findUnique({
-        where: { email: token.email },
+        where: { email: user.email },
         select: {
           id: true,
           role: true,
@@ -92,6 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       if (!dbUser) return token;
 
+      token.email = user.email;
       token.id = dbUser.id;
       token.role = dbUser.role;
       token.subscriptionTier = dbUser.subscriptionTier;
