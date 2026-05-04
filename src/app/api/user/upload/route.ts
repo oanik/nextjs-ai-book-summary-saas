@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       await mkdir(uploadDir, { recursive: true });
     }
 
-    const timestamp = `${Date.now()}-${file.name}`;
+    const timestamp = Date.now().toString();
     const originalFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
     const fileName = `${timestamp}-${originalFileName}`;
     const filePath = join(uploadDir, fileName);
