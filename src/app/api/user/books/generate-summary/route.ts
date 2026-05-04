@@ -8,10 +8,6 @@ import { z } from 'zod';
 import { auth } from '../../../../../../lib/auth';
 import { prisma } from '../../../../../../lib/db/prisma';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const SUMMARY_MODEL = process.env.OPENAI_BOOK_SUMMARY_MODEL || 'gpt-4o-mini';
 const MAX_SOURCE_CHARS = 15000;
 const EXTRACTED_TEXT_DIR = join(process.cwd(), 'storage', 'book-text');
@@ -150,6 +146,7 @@ const buildFullSummary = (summary: BookSummaryPayload) =>
   ].join('\n');
 
 const generateStructuredSummary = async (book: { title: string; author: string }, sourceText: string) => {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const completion = await openai.chat.completions.create({
     model: SUMMARY_MODEL,
     messages: [
