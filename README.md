@@ -85,6 +85,31 @@ Production assets included in the repo:
 - Do not perform broad refactors unless there is a specific reason.
 - Do not convert `.jsx` files to `.tsx` unless requested.
 
+## Commit Message Format
+
+Commit messages are validated by `commitlint` through a Husky `commit-msg` hook.
+
+Use the Conventional Commits pattern:
+
+```text
+type(scope): subject
+```
+
+Common `type` values:
+
+- `feat` for new functionality.
+- `fix` for bug fixes.
+- `docs` for documentation updates.
+- `refactor` for code changes without behavior changes.
+- `test` for adding or updating tests.
+- `chore` for maintenance tasks.
+
+Examples:
+
+- `feat(books): add create-book form validation`
+- `fix(dashboard): handle missing subscription gracefully`
+- `chore(deps): update prisma packages`
+
 ## Internal Guidance
 
 General project instructions for AI-assisted edits live in `AGENTS.md`.
