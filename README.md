@@ -41,6 +41,32 @@ npm run lint
 
 Open [http://localhost:3000](http://localhost:3000) in the browser.
 
+## UI Storybook
+
+The project includes Storybook for documenting and previewing shared UI components.
+
+Run Storybook locally:
+
+```bash
+npm run storybook
+```
+
+Build static Storybook files:
+
+```bash
+npm run build-storybook
+```
+
+Default Storybook URL:
+
+- [http://localhost:6006](http://localhost:6006)
+
+UI stories are colocated with shared components under `src/shared/ui`, for example:
+
+- `src/shared/ui/Button.tsx`
+- `src/shared/ui/Button.stories.tsx`
+- `src/shared/ui/README.md`
+
 ## Deployment
 
 The repository now includes a free-friendly production deployment path for the current architecture:

@@ -37,6 +37,7 @@
     "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
+    ".storybook/**/*.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts",

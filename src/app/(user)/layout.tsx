@@ -2,6 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import Button from '@/shared/ui/Button';
+
 import { auth, signOut } from '../../../lib/auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -36,9 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   await signOut({ redirectTo: '/admin/login' });
                 }}
               >
-                <button type="submit" className="text-sm text-gray-600 hover:text-gray-900">
-                  Sign Out
-                </button>
+                <Button type="submit" variant="primary" className="text-sm text-gray-600 hover:text-gray-900" />
               </form>
             </div>
           </div>
