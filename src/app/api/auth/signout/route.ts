@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { signOut } from '../../../../../lib/auth';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Clear the session cookie
     const cookieStore = await cookies();

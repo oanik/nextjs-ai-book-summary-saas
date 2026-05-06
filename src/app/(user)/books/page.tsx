@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -114,7 +115,13 @@ export default async function AdminBookPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
                       {book.coverImageUrl ? (
-                        <img src={book.coverImageUrl} alt={book.title} className="w-12 h-16 object-cover rounded" />
+                        <Image
+                          src={book.coverImageUrl}
+                          alt={book.title}
+                          width={48}
+                          height={64}
+                          className="h-16 w-12 rounded object-cover"
+                        />
                       ) : (
                         <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center">
                           <span className="text-2xl">📖</span>

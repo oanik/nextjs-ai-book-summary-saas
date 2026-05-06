@@ -207,8 +207,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Title *</label>
+                <label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700">
+                  Title *
+                </label>
                 <input
+                  id="title"
                   type="text"
                   name="title"
                   value={formData.title}
@@ -220,8 +223,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Author *</label>
+                <label htmlFor="author" className="mb-2 block text-sm font-medium text-gray-700">
+                  Author *
+                </label>
                 <input
+                  id="author"
                   type="text"
                   name="author"
                   value={formData.author}
@@ -234,8 +240,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Category *</label>
+              <label htmlFor="categoryId" className="mb-2 block text-sm font-medium text-gray-700">
+                Category *
+              </label>
               <select
+                id="categoryId"
                 name="categoryId"
                 value={formData.categoryId}
                 onChange={handleChange}
@@ -252,8 +261,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Description *</label>
+              <label htmlFor="description" className="mb-2 block text-sm font-medium text-gray-700">
+                Description *
+              </label>
               <textarea
+                id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
@@ -266,8 +278,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Upload Cover Image *</label>
+                <label htmlFor="coverImage" className="mb-2 block text-sm font-medium text-gray-700">
+                  Upload Cover Image *
+                </label>
                 <input
+                  id="coverImage"
                   type="file"
                   accept="image/*"
                   onChange={handleCoverImageChange}
@@ -285,8 +300,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Upload PDF File *</label>
+                <label htmlFor="pdfFile" className="mb-2 block text-sm font-medium text-gray-700">
+                  Upload PDF File *
+                </label>
                 <input
+                  id="pdfFile"
                   type="file"
                   accept=".pdf"
                   onChange={handlePdfChange}
@@ -298,8 +316,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Publication Year</label>
+                <label htmlFor="publicationYear" className="mb-2 block text-sm font-medium text-gray-700">
+                  Publication Year
+                </label>
                 <input
+                  id="publicationYear"
                   type="number"
                   name="publicationYear"
                   value={formData.publicationYear}
@@ -312,8 +333,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">ISBN</label>
+                <label htmlFor="isbn" className="mb-2 block text-sm font-medium text-gray-700">
+                  ISBN
+                </label>
                 <input
+                  id="isbn"
                   type="text"
                   name="isbn"
                   value={formData.isbn}
@@ -324,8 +348,11 @@ export default function NewBookForm({ categories }: NewBookFormProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Tags</label>
+                <label htmlFor="tags" className="mb-2 block text-sm font-medium text-gray-700">
+                  Tags
+                </label>
                 <input
+                  id="tags"
                   type="text"
                   name="tags"
                   value={formData.tags}

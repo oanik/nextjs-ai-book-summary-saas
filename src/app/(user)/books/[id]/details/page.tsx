@@ -9,6 +9,17 @@ import { useParams, useRouter } from 'next/navigation';
 import { fetchBookDetails } from '../../../../../features/books/api/client';
 import type { BookDetails } from '../../../../../features/books/model/types';
 
+function createCaptionTrack(summary: string): string {
+  const sanitizedSummary = summary.replace(/\s+/g, ' ').trim();
+  const vtt = `WEBVTT
+
+00:00.000 --> 99:59.000
+${sanitizedSummary || 'Audio chapter narration.'}
+`;
+
+  return `data:text/vtt;charset=utf-8,${encodeURIComponent(vtt)}`;
+}
+
 export default function BookDetailsPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -219,6 +230,13 @@ export default function BookDetailsPage() {
                           src={chapter.audioUrl}
                           onEnded={() => setCurrentAudio(null)}
                         >
+                          <track
+                            kind="captions"
+                            srcLang="en"
+                            label="English captions"
+                            src={createCaptionTrack(chapter.chapterSummary)}
+                            default
+                          />
                           Your browser does not support the audio element.
                         </audio>
                       </div>
