@@ -25,6 +25,8 @@ const adapter = new PrismaMariaDb({
   ssl: parsedDatabaseUrl.searchParams.get('ssl') === 'true',
 });
 
+//just added comment
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
