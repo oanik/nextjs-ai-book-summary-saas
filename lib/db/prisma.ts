@@ -19,6 +19,10 @@ const adapter = new PrismaMariaDb({
   user: decodeURIComponent(parsedDatabaseUrl.username),
   password: decodeURIComponent(parsedDatabaseUrl.password),
   database: parsedDatabaseUrl.pathname.replace(/^\//, ''),
+  // Important for local MySQL 8 auth flow
+  allowPublicKeyRetrieval: parsedDatabaseUrl.searchParams.get('allowPublicKeyRetrieval') !== 'false',
+  // Common local Docker default (no TLS)
+  ssl: parsedDatabaseUrl.searchParams.get('ssl') === 'true',
 });
 
 export const prisma =
