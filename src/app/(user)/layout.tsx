@@ -78,6 +78,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <span className="font-medium">Categories</span>
             </Link>
             <Link
+              href="/favourites"
+              className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-xl">❤️</span>
+              <span className="font-medium">Favourites</span>
+            </Link>
+            <Link
               href="/reviews"
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
             >

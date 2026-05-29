@@ -1,0 +1,265 @@
+---
+description: Feature-sliced data layer — model functions, API clients, and Route Handlers
+globs: src/features/**/*,src/app/api/**/*
+alwaysApply: false
+---
+
+# Feature-Sliced Data Layer
+
+BookWise separates **what data means** (types), **how the server reads/writes it** (model), and **how the browser calls the server** (API client + Route Handlers). Server Components talk to the database directly; Client Components go through typed fetch wrappers.
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Server Component (page.tsx)                                    │
+│  auth() → feature/model/*.ts → prisma                           │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  Client Component (*-form.tsx, *-client.tsx)                    │
+│  user action → features/<domain>/api/client.ts → fetch()        │
+└───────────────────────────────┬─────────────────────────────────┘
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Route Handler (src/app/api/**/route.ts)                        │
+│  auth() → zod validate → prisma → NextResponse.json()           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**When to use which path**
+
+| Need | Use |
+|------|-----|
+| Initial page data, lists, dashboards | Server Component + `features/<domain>/model/` |
+| Form submit, file upload, polling from `'use client'` | `features/<domain>/api/client.ts` + `src/app/api/` |
+| Auth-only redirect on missing session | `redirect('/login')` in Server Components |
+| Auth for JSON APIs | `401` from Route Handlers |
+
+Shared infrastructure lives outside features: `lib/auth.ts`, `lib/db/prisma.ts`.
+
+## Directory Structure
+
+```
+src/
+├── features/
+│   ├── books/
+│   │   ├── api/
+│   │   │   └── client.ts          # Browser fetch wrappers
+│   │   └── model/
+│   │       └── types.ts           # Domain types shared by client + server
+│   └── dashboard/
+│       ├── lib/
+│       │   └── helpers.ts         # Pure helpers (no I/O)
+│       └── model/
+│           ├── getDashboardUser.ts
+│           └── getSubscriptionOrders.ts
+├── app/
+│   ├── (user)/<route>/
+│   │   ├── page.tsx               # Server Component — loads data
+│   │   └── *-client.tsx           # Client Component — interactivity
+│   └── api/
+│       └── user/
+│           ├── books/route.ts
+│           └── books/[id]/details/route.ts
+lib/
+├── auth.ts
+└── db/prisma.ts
+```
+
+Each feature owns its domain. Do not import Prisma inside `features/*/api/client.ts`.
+
+## Step-by-Step: Add a New Domain Operation
+
+### 1. Define types
+
+Add request/response shapes in `src/features/<domain>/model/types.ts`.
+
+```typescript
+export type CreateBookPayload = {
+  title: string;
+  author: string;
+  categoryId: number;
+  // ...
+};
+
+export type CreateBookSuccess = { id: number };
+
+export type CreateBookFailure = {
+  error?: string;
+  errors?: Record<string, string>;
+};
+```
+
+### 2. Add a Route Handler (mutations / client-triggered reads)
+
+Create `src/app/api/user/<resource>/route.ts`:
+
+1. Import `auth` from `lib/auth` and `prisma` from `lib/db/prisma`.
+2. Define a Zod schema for the request body or query params.
+3. Export named HTTP methods (`GET`, `POST`, `PATCH`, `DELETE`).
+4. Guard with session check → `401`.
+5. Validate input → `400` with field errors.
+6. Perform Prisma work.
+7. Return typed JSON with correct status (`200`, `201`, `404`, `500`).
+8. Wrap in `try/catch`; log server errors with `console.error`.
+
+### 3. Add a client API wrapper
+
+In `src/features/<domain>/api/client.ts`:
+
+1. Import types from `../model/types`.
+2. Export async functions that call `/api/...` via `fetch`.
+3. Parse JSON safely (see `safeJson` pattern below).
+4. Return discriminated results (`{ ok: true, data } | { ok: false, data }`) for mutations.
+
+### 4. Wire the UI
+
+- **Server page**: fetch seed data with Prisma or `features/<domain>/model/*`, pass props to a Client Component.
+- **Client component**: call the API client on submit; handle loading, field errors, and toasts.
+
+### 5. (Optional) Add a server model function
+
+When the same Prisma query is reused across pages, extract to `features/<domain>/model/getX.ts`. Serialize `Date` fields to ISO strings before crossing the server/client boundary.
+
+## Coding Standards
+
+### Route Handlers
+
+- Use named exports: `export async function POST(request: NextRequest)`.
+- Validate all external input with **Zod** (`safeParse`, not `parse`).
+- Map Zod issues to `{ errors: Record<string, string> }` for forms.
+- Never expose raw Prisma/DB errors to the client.
+- Use `NextResponse.json(body, { status })` consistently.
+- Dynamic route params in Next.js 16 are a **Promise** — always `await params`.
+- Set `export const runtime = 'nodejs'` when using Node APIs (`fs`, `Buffer`).
+
+### Feature API clients
+
+- One function per endpoint; name by action (`createBook`, `fetchBookDetails`).
+- Use relative `/api/...` paths (same origin).
+- Set `Content-Type: application/json` for JSON bodies.
+- Do not catch and swallow errors silently — return `null` or `{ ok: false }` and let the UI decide.
+- Keep clients free of React imports.
+
+### Model functions
+
+- Accept explicit IDs/inputs; do not read cookies or headers inside model layer.
+- Use narrow `select` / `include` — fetch only fields the UI needs.
+- Return `null` for missing records; let callers handle redirects or 404s.
+
+### Types
+
+- Colocate domain types in `features/<domain>/model/types.ts`.
+- Share types between API client and components; do not duplicate shapes inline.
+- Prefer `type` for payloads/unions; use `interface` for object shapes already established in the feature.
+
+## Code Review Checklist
+
+- [ ] Client Component does **not** import `prisma` or `auth` directly.
+- [ ] Route Handler checks `session?.user` before mutating or returning private data.
+- [ ] Request body validated with Zod; invalid input returns `400` with field map.
+- [ ] HTTP status codes are accurate (`201` create, `401` unauth, `404` missing, `500` unexpected).
+- [ ] API client return type matches Route Handler response shape.
+- [ ] Dates serialized before passing from server model to client components.
+- [ ] No duplicate fetch: server page loads initial data; client only refetches after mutations.
+- [ ] Error paths show user-visible feedback (toast, inline errors, error boundary).
+- [ ] New files live under the correct feature folder, not loose in `src/app`.
+
+## Working Examples
+
+### Server page + model (dashboard)
+
+```typescript
+// src/app/(user)/dashboard/page.tsx
+const session = await auth();
+if (!session?.user?.id) redirect('/login');
+
+const userPromise = getDashboardUser(session.user.id);
+const subscriptionOrdersPromise = getSubscriptionOrders(session.user.id);
+
+return (
+  <Suspense fallback={<DashboardSkeleton />}>
+    <DashboardClient userPromise={userPromise} subscriptionOrdersPromise={subscriptionOrdersPromise} />
+  </Suspense>
+);
+```
+
+```typescript
+// src/features/dashboard/model/getDashboardUser.ts
+export async function getDashboardUser(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { /* ... */ } });
+  if (!user) return null;
+  return { ...user, createdAt: user.createdAt.toISOString() };
+}
+```
+
+### Route Handler with auth + Zod (create book)
+
+```typescript
+// src/app/api/user/books/route.ts
+export async function POST(request: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const validation = bookSchema.safeParse(await request.json());
+    if (!validation.success) {
+      const errors: Record<string, string> = {};
+      validation.error.issues.forEach((issue) => {
+        if (issue.path[0]) errors[issue.path[0].toString()] = issue.message;
+      });
+      return NextResponse.json({ error: 'Validation failed', errors }, { status: 400 });
+    }
+
+    const book = await prisma.book.create({ data: { /* ... */ createdById: session.user.id ?? '' } });
+    return NextResponse.json(book, { status: 201 });
+  } catch (error) {
+    console.error('Error Creating book', error);
+    return NextResponse.json({ error: 'Failed to create book' }, { status: 500 });
+  }
+}
+```
+
+### Feature API client (browser-side)
+
+```typescript
+// src/features/books/api/client.ts
+const safeJson = async <T>(response: Response): Promise<T | null> => {
+  try {
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
+};
+
+export const createBook = async (
+  payload: CreateBookPayload,
+): Promise<{ ok: true; data: CreateBookSuccess } | { ok: false; data: CreateBookFailure }> => {
+  const response = await fetch('/api/user/books', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = (await safeJson<CreateBookSuccess | CreateBookFailure>(response)) ?? {};
+  if (!response.ok) return { ok: false, data: data as CreateBookFailure };
+  return { ok: true, data: data as CreateBookSuccess };
+};
+```
+
+### Client form consuming the API client
+
+```typescript
+// src/app/(user)/books/new/new-book-form.tsx
+'use client';
+
+import { createBook, uploadUserFile } from '../../../../features/books/api/client';
+import type { CategoryOption } from '../../../../features/books/model/types';
+
+// Server page passes categories; form calls createBook() on submit
+```
+
+Reference implementations: `src/features/books/`, `src/features/dashboard/`, `src/app/api/user/books/route.ts`.

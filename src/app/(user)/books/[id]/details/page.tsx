@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { fetchBookDetails } from '@features/books/api/client';
+import type { BookDetails } from '@features/books/model/types';
 
-import { fetchBookDetails } from '../../../../../features/books/api/client';
-import type { BookDetails } from '../../../../../features/books/model/types';
+import { FavouriteButton } from './favourite-button';
 
 function createCaptionTrack(summary: string): string {
   const sanitizedSummary = summary.replace(/\s+/g, ' ').trim();
@@ -73,12 +74,19 @@ export default function BookDetailsPage() {
           <h1 className="text-3xl font-bold text-gray-900">{book.title}</h1>
           <p className="text-gray-600 mt-2">by {book.author}</p>
         </div>
-        <button
-          onClick={() => router.push('/books')}
-          className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
-        >
-          ← Back to Books
-        </button>
+        <div className="flex items-center gap-3">
+          <FavouriteButton
+            bookId={book.id}
+            initialIsFavourited={book.isFavourited}
+            canUseFavourites={book.canUseFavourites}
+          />
+          <button
+            onClick={() => router.push('/books')}
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+          >
+            ← Back to Books
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">

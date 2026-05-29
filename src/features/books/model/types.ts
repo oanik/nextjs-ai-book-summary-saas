@@ -29,6 +29,8 @@ export interface BookDetails {
   isPublished: boolean;
   summaryGenerated: boolean;
   audioGenerated: boolean;
+  isFavourited: boolean;
+  canUseFavourites: boolean;
   category: {
     name: string;
   };

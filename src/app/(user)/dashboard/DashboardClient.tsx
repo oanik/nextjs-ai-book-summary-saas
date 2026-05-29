@@ -244,7 +244,7 @@ const DashboardClient = ({ userPromise, subscriptionOrdersPromise }: Props) => {
                   <span className="text-gray-400">{'→'}</span>
                 </Link>
                 <Link
-                  href="/favorites"
+                  href="/favourites"
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
                 >
                   <div className="flex items-center">

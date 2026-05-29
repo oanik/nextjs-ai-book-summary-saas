@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+.playwright-mcp/
 
 # next.js
 /.next/
@@ -48,3 +49,5 @@ docker-compose*.yml
 
 *storybook.log
 storybook-static
+
+
